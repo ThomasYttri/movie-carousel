@@ -10,18 +10,24 @@ export default function Home() {
   const [favorites, setFavorites] = useState<IMovie[]>();
   //Function for toggle movie as favourite
   const toggleFavorite = (movie: IMovie) => {
+    let newFavorites: IMovie[] = [];
     if (!favorites || favorites.length === 0) {
-      setFavorites([movie]);
+      newFavorites.push(movie);
+      setFavorites(newFavorites);
+      localStorage.setItem("favorite-movies", JSON.stringify(newFavorites));
       return;
     }
+    // If movie already is favorited, remove from favorites
     if (favorites.some((favMovie) => favMovie.imdbID === movie.imdbID)) {
-      // If movie already is favorited, remove from favorites
-      setFavorites((favorites) =>
-        favorites?.filter((favorite) => favorite.imdbID !== movie.imdbID)
+      newFavorites = favorites.filter(
+        (favorite) => favorite.imdbID !== movie.imdbID
       );
+      setFavorites(newFavorites);
     } else {
-      setFavorites([...favorites, movie]);
+      newFavorites = [...favorites, movie];
+      setFavorites(newFavorites);
     }
+    localStorage.setItem("favorite-movies", JSON.stringify(newFavorites));
   };
 
   //Clear favorites
@@ -36,6 +42,10 @@ export default function Home() {
       setMovies(fetchedMovies);
     }
     FetchData();
+    const localFavorites = localStorage.getItem("favorite-movies");
+    if (localFavorites) {
+      setFavorites(JSON.parse(localFavorites));
+    }
   }, []);
   return (
     <main className={`min-h-screen py-4 ${inter.className}`}>
