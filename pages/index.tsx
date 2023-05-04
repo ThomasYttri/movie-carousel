@@ -34,14 +34,15 @@ export default function Home() {
   const clearFavorites = () => {
     setFavorites([]);
   };
+  const fetchMovies = async () => {
+    const res = await fetch("/api/getMovies");
+    const fetchedMovies = await res.json();
+    setMovies(fetchedMovies);
+  };
   // Could have been solved with getStaticProps + webhook or SSR
   useEffect(() => {
-    async function FetchData() {
-      const res = await fetch("/api/getMovies");
-      const fetchedMovies = await res.json();
-      setMovies(fetchedMovies);
-    }
-    FetchData();
+    fetchMovies();
+    //Check localstorage
     const localFavorites = localStorage.getItem("favorite-movies");
     if (localFavorites) {
       setFavorites(JSON.parse(localFavorites));
@@ -58,6 +59,12 @@ export default function Home() {
       ) : (
         <p className="text-red-300">No movies returned from API</p>
       )}
+      <button
+        className=" bg-slate-800 px-8 py-4 ml-8 rounded-lg transition hover:bg-slate-900 disabled:bg-slate-500"
+        onClick={fetchMovies}
+      >
+        Fetch new movies
+      </button>
       {favorites && (
         <Carousel
           title="Favourites"
